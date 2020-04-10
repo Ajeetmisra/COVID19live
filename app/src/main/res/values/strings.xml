@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">COVID19Live</string>
+    <string name="total">Total</string>
+    <string name="confirmedCasesIndian">confirmedCasesIndian</string>
+    <string name="confirmedCasesForeign">confirmedCasesForeign</string>
+    <string name="discharged">Discharged</string>
+    <string name="deaths">Deaths</string>
+    <string name="confirmedButLocationUnidentified">confirmedButLocationUnidentified</string>
+</resources>
