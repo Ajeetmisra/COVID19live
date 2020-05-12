@@ -2,38 +2,57 @@ package com.example.covid19;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity {
 
+    ProgressDialog Dialog;
+    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Dialog  = new ProgressDialog(MainActivity.this);
+        Dialog.setMessage("Fetching Appropriate data.... ");
+        Dialog.show();
         TextView totaltext = (TextView) findViewById(R.id.totaltext);
     TextView totaltext2 =(TextView) findViewById(R.id.totaltext2);
     TextView totaltext3 =(TextView) findViewById(R.id.totaltext3);
     TextView totaltext5 =(TextView) findViewById(R.id.totaltext5);
     TextView totaltext6=(TextView) findViewById(R.id.totaltext6);
-    TextView totaltext7 =(TextView) findViewById(R.id.totaltext7);
+    button = (Button) findViewById(R.id.button);
+
 
     final TextView valuetotal = (TextView) findViewById(R.id.valueTotal);
     final TextView valueindian = (TextView) findViewById(R.id.valueconfirmIND);
     final TextView valuefrn = (TextView) findViewById(R.id.valueconfirmFRN);
     final TextView valuedischarge = (TextView) findViewById(R.id.valueDischarge);
     final TextView valuedeaths = (TextView) findViewById(R.id.valueDeaths);
-    final TextView valuenotfnd = (TextView) findViewById(R.id.valueNotfnd);
+   button.setOnClickListener(new View.OnClickListener() {
+       @Override
+       public void onClick(View v) {
+           Intent intent = new Intent(MainActivity.this, Main3Activity.class);
+           startActivity(intent);       }
+   });
+
 
     AsyncHttpClient client = new AsyncHttpClient();
         client.get("https://api.rootnet.in/covid19-in/stats/latest", new JsonHttpResponseHandler(){
@@ -49,16 +68,29 @@ public class MainActivity extends AppCompatActivity {
                     int discharge = response.getJSONObject("data").getJSONObject("summary").getInt("discharged");
                     int death = response.getJSONObject("data").getJSONObject("summary").getInt("deaths");
                     int unknown = response.getJSONObject("data").getJSONObject("summary").getInt("confirmedButLocationUnidentified");
-
                     valuetotal.setText(String.valueOf(Totalcases));
                     valueindian.setText(String.valueOf(indians));
                     valuefrn.setText(String.valueOf(forners));
                     valuedischarge.setText(String.valueOf(discharge));
                     valuedeaths.setText(String.valueOf(death));
-                    valuenotfnd.setText(String.valueOf(unknown));
+                    Dialog.dismiss();
+
+                    JSONObject jsonresponse = new JSONObject(json);
+                    JSONObject jsonObjectdata = jsonresponse.getJSONObject("data");
+                    JSONArray jsonArray = jsonObjectdata.getJSONArray("regional");
+                    final int max = jsonArray.length();
+//
+                    for (int i = 0; i < max; i++) {
+                        JSONObject currentStatesResponse = jsonArray.getJSONObject(i);
+                        String loca = currentStatesResponse.getString("loc");
+                        int totalCase = currentStatesResponse.getInt("totalConfirmed");
+//                        States states = new States(loca, totalCase);
+//                        list.add(states);
+                        Log.i("ajeet", "onSuccess: " +totalCase);
+                    }
 
 
-                    Log.d("app", "onSuccess: "+Totalcases);
+                        Log.d("app", "onSuccess: "+Totalcases);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -74,4 +106,5 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
 }
